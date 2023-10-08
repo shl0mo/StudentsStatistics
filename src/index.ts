@@ -126,7 +126,7 @@ class Class {
 	}
 }
 
-function editStudent () {
+function enableEditStudent () {
 	const currentNode = this
 	const card = currentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
 	const cards_collection = document.getElementsByClassName('row w-75 mb-1')
@@ -134,7 +134,25 @@ function editStudent () {
 	for (let i = 0; i < cards_collection.length; i++) {
 		if (cards_collection[i] === card) student_position = i
 	}
-	console.log(_class.getStudents()[student_position])
+	const card_position = student_position + 1
+	const input_name : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-name-edit-${card_position}`))
+	const input_age : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-age-edit-${card_position}`))
+	const input_height : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-height-edit-${card_position}`))
+	const input_weight : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-weight-edit-${card_position}`))
+	const save_updates_button : HTMLElement = (<HTMLElement>document.querySelector(`#save-updates-button-${card_position}`))
+	const inputs : HTMLInputElement[] = []
+	inputs.push(input_name)
+	inputs.push(input_age)
+	inputs.push(input_height)
+	inputs.push(input_weight)
+	for (const input of inputs) {
+		input.readOnly = false
+		input.classList.add('bg-light')
+		input.classList.replace('border-0', 'border-1')
+		input.classList.add('rounded')
+		input.classList.add('p-1')
+	}
+	save_updates_button.classList.replace('d-none', 'd-block')
 }
 
 function deleteStudent () {
@@ -188,15 +206,16 @@ const addNewStudent = (_class : Class) => {
 	}
 	students.push(new_student)
 	const students_info_container : HTMLElement = (<HTMLElement>document.querySelector('#students-info-container'))
+	const card_position = _class.getStudents().length
 	let card_element_string : string = `
 		<div class="row w-75 mb-1">
 			<div class="card position-relative shadow p-1">
 				<div class="card-body">
 					<div class="d-flex flex-row justify-content-between m-0">
-						<h6 class="card-title mb-3"><input type="text" id="input-name-edit" class="info-input border-0" value="${name}" readonly></h6>
+						<h6 class="card-title mb-3">${id}.<input type="text" id="input-name-edit-${card_position}" class="info-input border-0" value="${name}" readonly></h6>
 								<div class="d-flex flex-row w-25 justify-content-around">
 								<div>
-									<button type="button" class="btn p-0 pb-2 edit-button-card" data-bs-toggle="modal" data-bs-target="modal-add-card"><i class="bi bi-pencil-square"></i></button>
+									<button type="button" class="btn p-0 pb-2 edit-button-card"><i class="bi bi-pencil-square"></i></button>
 								</div>
 								<div>
 									<button type="button" class="btn-close close-button-card" aria-label="Fechar"></button>
@@ -204,8 +223,14 @@ const addNewStudent = (_class : Class) => {
 							</div>
 						</div>
 						<hr class="mt-1">
-						<p><div class="mb-1">idade: <input id="input-age-edit" class="info-input border-0" value="${age}" readonly><br> altura: <input id="input-height-edit" class="info-input border-0" value="${height}" readonly><br> peso: <input id="input-weight-edit" class="info-input border-0" value="${weight}" readonly></div></p>
+						<p><div class="mb-1">
+							idade: <input type="number" id="input-age-edit-${card_position}" class="info-input border-0" value="${age}" readonly><br>
+							altura: <input type="number"id="input-height-edit-${card_position}" class="info-input border-0" value="${height}" readonly><br>
+							peso: <input id="input-weight-edit-${card_position}" type="number" class="info-input border-0" value="${weight}" readonly>
+						</div></p>
+						<buttom id="save-updates-button-${card_position}" class="btn btn-primary d-none">Salvar</button>
 					</div>
+
 				</div>
 			</div>
 		</div>
@@ -216,7 +241,7 @@ const addNewStudent = (_class : Class) => {
 	const edit_buttons : NodeListOf<HTMLElement> = document.querySelectorAll('.edit-button-card')
 	for (let i = 0; i < close_buttons.length; i++) {
 		close_buttons[i].addEventListener('click', deleteStudent, false)
-		edit_buttons[i].addEventListener('click', editStudent, false)
+		edit_buttons[i].addEventListener('click', enableEditStudent, false)
 	}
 	updateStatistics(_class)
 }
