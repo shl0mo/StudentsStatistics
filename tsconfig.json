@@ -7,9 +7,9 @@
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"noImplicitThis": false	
 	},
 	"include": ["./src/"],
-	"exclude": ["node_modules"],
-	"noImplicitThis": false	
+	"exclude": ["node_modules"]
 }

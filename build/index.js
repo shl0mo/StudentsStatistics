@@ -116,7 +116,6 @@ function enableEditingStudent() {
         if (cards_collection[i] === card)
             student_position = i;
     }
-    // console.log(student_position)
     obj_globals.current_student_position = student_position;
     const reference_id = students[student_position].getId();
     const input_name = document.querySelector(`#input-name-edit-${reference_id}`);
