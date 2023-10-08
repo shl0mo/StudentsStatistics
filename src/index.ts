@@ -72,7 +72,7 @@ class Class {
 	private id : number = 0
 	private name : string = ''
 	private students : Student[] = []
-	private last_student_id_reference : number = 1  
+	private last_student_id_reference : number = 1
 	
 	constructor (id : number, name : string, students : Student[]) {
 		this.setId(id)
@@ -130,21 +130,23 @@ class Class {
 	}
 }
 
-function enableEditStudent () {
+function enableEditingStudent () {
 	const currentNode = this
+	const students = _class.getStudents()
 	const card = currentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
 	const cards_collection = document.getElementsByClassName('row w-75 mb-1')
 	let student_position = 0
 	for (let i = 0; i < cards_collection.length; i++) {
 		if (cards_collection[i] === card) student_position = i
 	}
+	// console.log(student_position)
 	obj_globals.current_student_position = student_position
-	const card_position = student_position + 1
-	const input_name : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-name-edit-${card_position}`))
-	const input_age : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-age-edit-${card_position}`))
-	const input_height : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-height-edit-${card_position}`))
-	const input_weight : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-weight-edit-${card_position}`))
-	const save_updates_button : HTMLElement = (<HTMLElement>document.querySelector(`#save-updates-button-${card_position}`))
+	const reference_id : number = students[student_position].getId()
+	const input_name : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-name-edit-${reference_id}`))
+	const input_age : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-age-edit-${reference_id}`))
+	const input_height : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-height-edit-${reference_id}`))
+	const input_weight : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-weight-edit-${reference_id}`))
+	const save_updates_button : HTMLElement = (<HTMLElement>document.querySelector(`#save-updates-button-${reference_id}`))
 	const inputs : HTMLInputElement[] = []
 	inputs.push(input_name)
 	inputs.push(input_age)
@@ -188,12 +190,12 @@ const updateStatistics = (/*_class : Class*/) => {
 const saveUpdates = () => {
 	const students = _class.getStudents()
 	const student_position = obj_globals.current_student_position
-	const card_position = student_position + 1
-	const input_name : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-name-edit-${card_position}`))
-	const input_age : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-age-edit-${card_position}`))
-	const input_height : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-height-edit-${card_position}`))
-	const input_weight : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-weight-edit-${card_position}`))
-	const save_updates_button : HTMLElement = (<HTMLElement>document.querySelector(`#save-updates-button-${card_position}`))
+	const reference_id = students[obj_globals.current_student_position].getId()
+	const input_name : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-name-edit-${reference_id}`))
+	const input_age : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-age-edit-${reference_id}`))
+	const input_height : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-height-edit-${reference_id}`))
+	const input_weight : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-weight-edit-${reference_id}`))
+	const save_updates_button : HTMLElement = (<HTMLElement>document.querySelector(`#save-updates-button-${reference_id}`))
 	const input_name_value : string = input_name.value
 	const input_age_value : number = parseInt(input_age.value)
 	const input_height_value : number = parseFloat(input_height.value)
@@ -216,11 +218,11 @@ const saveUpdates = () => {
 	}
 	save_updates_button.classList.replace('d-block', 'd-none')
 	updateStatistics()
+	console.log(_class.getStudents())
 }
 
 const addNewStudent = (_class : Class) => {
 	const id = _class.getLastStudentIdReference()
-	_class.newStudentCreated()
 	let name : string = (<HTMLInputElement>document.querySelector('#input-name')).value
 	const surname : string = (<HTMLInputElement>document.querySelector('#input-surname')).value
 	const age_string : string = (<HTMLInputElement>document.querySelector('#input-age')).value
@@ -244,13 +246,13 @@ const addNewStudent = (_class : Class) => {
 	}
 	students.push(new_student)
 	const students_info_container : HTMLElement = (<HTMLElement>document.querySelector('#students-info-container'))
-	const card_position = _class.getStudents().length
+	const reference_id = _class.getLastStudentIdReference()
 	let card_element_string : string = `
 		<div class="row w-75 mb-1">
 			<div class="card position-relative shadow p-1">
 				<div class="card-body">
 					<div class="d-flex flex-row justify-content-between m-0">
-						<h6 class="card-title mb-3">${id}.<input type="text" id="input-name-edit-${card_position}" class="info-input border-0" value="${name}" readonly></h6>
+						<h6 class="card-title mb-3">${id}.<input type="text" id="input-name-edit-${reference_id}" class="info-input border-0" value="${name}" readonly></h6>
 								<div class="d-flex flex-row w-25 justify-content-around">
 								<div>
 									<button type="button" class="btn p-0 pb-2 edit-button-card"><i class="bi bi-pencil-square"></i></button>
@@ -262,11 +264,11 @@ const addNewStudent = (_class : Class) => {
 						</div>
 						<hr class="mt-1">
 						<p><div class="mb-1">
-							idade: <input type="number" id="input-age-edit-${card_position}" class="info-input border-0" value="${age}" readonly><br>
-							altura: <input type="number"id="input-height-edit-${card_position}" class="info-input border-0" value="${height}" readonly><br>
-							peso: <input id="input-weight-edit-${card_position}" type="number" class="info-input border-0" value="${weight}" readonly>
+							idade: <input type="number" id="input-age-edit-${reference_id}" class="info-input border-0" value="${age}" readonly><br>
+							altura: <input type="number"id="input-height-edit-${reference_id}" class="info-input border-0" value="${height}" readonly><br>
+							peso: <input id="input-weight-edit-${reference_id}" type="number" class="info-input border-0" value="${weight}" readonly>
 						</div></p>
-						<buttom id="save-updates-button-${card_position}" class="save-updates-button btn btn-primary d-none">Salvar</button>
+						<buttom id="save-updates-button-${reference_id}" class="save-updates-button btn btn-primary d-none">Salvar</button>
 					</div>
 
 				</div>
@@ -280,10 +282,11 @@ const addNewStudent = (_class : Class) => {
 	const save_updates_buttons : NodeListOf<HTMLElement> = document.querySelectorAll('.save-updates-button')
 	for (let i = 0; i < close_buttons.length; i++) {
 		close_buttons[i].addEventListener('click', deleteStudent, false)
-		edit_buttons[i].addEventListener('click', enableEditStudent, false)
+		edit_buttons[i].addEventListener('click', enableEditingStudent, false)
 		save_updates_buttons[i].addEventListener('click', saveUpdates, false)
 	}
 	updateStatistics(/*_class*/)
+	_class.newStudentCreated()
 }
 
 const interval = setInterval(() => {
