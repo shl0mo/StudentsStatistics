@@ -139,7 +139,6 @@ function enableEditingStudent () {
 	for (let i = 0; i < cards_collection.length; i++) {
 		if (cards_collection[i] === card) student_position = i
 	}
-	// console.log(student_position)
 	obj_globals.current_student_position = student_position
 	const reference_id : number = students[student_position].getId()
 	const input_name : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-name-edit-${reference_id}`))
