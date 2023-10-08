@@ -13,18 +13,18 @@ type Class = {
 }*/
 
 class Student {
-	private id : number
-	private name : string
-	private age : number
-	private height : number
-	private weight : number
+	private id : number = 0
+	private name : string = ''
+	private age : number = 0
+	private height : number = 0
+	private weight : number = 0
 
 	constructor (id : number, name : string, age : number, height : number, weight : number) {
-		setId(id)
-		setName(name)
-		setAge(age)
-		setHeight(height)
-		setWeight(weight)
+		this.setId(id)
+		this.setName(name)
+		this.setAge(age)
+		this.setHeight(height)
+		this.setWeight(weight)
 
 	}
 
@@ -36,20 +36,24 @@ class Student {
 		this.name = name
 	}
 
-	public setAge (age : string) : void {
+	public setAge (age : number) : void {
 		this.age = age
 	}
 
-	public setHeight (height : string) : void {
+	public setHeight (height : number) : void {
 		this.height = height
 	}
 
-	public setWeight (weight : string) : void {
+	public setWeight (weight : number) : void {
 		this.weight = weight
 	}
 
 	public getId () : number {
 		return this.id
+	}
+
+	public getAge() : number {
+		return this.age
 	}
 
 	public getName () : string {
@@ -66,16 +70,15 @@ class Student {
 }
 
 class Class {
-	private id : number
-	private name : string
-	private students : Student[]
+	private id : number = 0
+	private name : string = ''
+	private students : Student[] = []
 	private last_student_id_reference : number = 1  
 	
 	constructor (id : number, name : string, students : Student[]) {
-		setId(id)
-		setName(name)
-		setStudents(students)
-		obj_globals.student_id_reference = obj_globals.student_id_reference + 1
+		this.setId(id)
+		this.setName(name)
+		this.setStudents(students)
 	}
 
 	public setId (id : number) : void {
@@ -95,27 +98,27 @@ class Class {
 	}
 
 	public getNumStudents () : number {
-		return getStudents().length
+		return this.getStudents().length
 	}
 
 	public getAgesMean () : number {
 		const students : Student[] = this.getStudents()
 		const ages_sum : number = students.reduce((sum, student) => sum + student.getAge(), 0)
-		const ages_mean : number = ages_sum/getNumStudents()
+		const ages_mean : number = ages_sum/this.getNumStudents()
 		return ages_mean
 	}
 
 	public getHeightsMean () : number {
 		const students : Student[] = this.getStudents()
 		const heights_sum : number = students.reduce((sum, student) => sum + student.getHeight(), 0)
-		const heights_mean : number = heights_sum/getNumStudents()
+		const heights_mean : number = heights_sum/this.getNumStudents()
 		return heights_mean
 	}
 
 	public getWeightsMean () : number {
 		const students : Student[] = this.getStudents()
 		const weights_sum : number = students.reduce((sum, student) => sum + student.getWeight(), 0)
-		const weights_mean : number = weights_sum/getNumStudents()
+		const weights_mean : number = weights_sum/this.getNumStudents()
 		return weights_mean
 	}
 
@@ -130,20 +133,37 @@ class Class {
 
 
 const students : Student[] = []
-const _class = new Class(1, 'Physical Education Class', students)
+const _class : Class = new Class(1, 'Physical Education Class', students)
 
 
-const addNewStudent = (_class) => {
-	private id : number
-	private name : string
-	private age : number
-	private height : number
-	private weight : number
-
-
+const addNewStudent = (_class : Class) => {
 	const id = _class.getLastStudentIdReference()
 	_class.newStudentCreated()
-	const name : string = (<HTMLInputElemnt>document.querySelector('#input-name')).value
-	const age : number = (<HTMLInputElement>document.querySelector('#input-age')).value
-	// const 
+	const name : string = (<HTMLInputElement>document.querySelector('#input-name')).value
+	const age_string : string = (<HTMLInputElement>document.querySelector('#input-age')).value
+	const height_string : string = (<HTMLInputElement>document.querySelector('#input-height')).value
+	const weight_string : string = (<HTMLInputElement>document.querySelector('#input-weight')).value
+	if (name === '' || age_string == '' || height_string == '' || weight_string == '') {
+		alert('Preencha todos os campos')
+		return
+	}
+	const age : number = parseInt((<HTMLInputElement>document.querySelector('#input-age')).value)
+	const height : number = parseFloat((<HTMLInputElement>document.querySelector('#input-height')).value)
+	const weight : number = parseFloat((<HTMLInputElement>document.querySelector('#input-weight')).value)
+	const new_student = new Student(id, name, age, height, weight)
+	const students = _class.getStudents()
+	students.push(new_student)
+	/*Next:
+	 * Create new student element and append it to the students container
+	 */
 }
+
+const interval = setInterval(() => {
+	const button_add_new_student : HTMLElement | null = document.querySelector('#button-add-new-student')
+	if (document.contains(button_add_new_student)) {
+		button_add_new_student?.addEventListener('click', () => { addNewStudent(_class) })
+		clearInterval(interval)
+	}
+}, 500)
+
+
