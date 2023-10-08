@@ -1,3 +1,7 @@
+const obj_globals = {
+	current_student_position: 0
+}
+
 class Student {
 	private id : number = 0
 	private name : string = ''
@@ -134,6 +138,7 @@ function enableEditStudent () {
 	for (let i = 0; i < cards_collection.length; i++) {
 		if (cards_collection[i] === card) student_position = i
 	}
+	obj_globals.current_student_position = student_position
 	const card_position = student_position + 1
 	const input_name : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-name-edit-${card_position}`))
 	const input_age : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-age-edit-${card_position}`))
@@ -165,19 +170,52 @@ function deleteStudent () {
 	}
 	document.querySelector('#students-info-container')?.children[student_position].remove()
 	_class.getStudents().splice(student_position, 1)
-	updateStatistics(_class)
+	updateStatistics(/*_class*/)
 }
 
 const students : Student[] = []
 const _class : Class = new Class(1, 'Physical Education Class', students)
 
-const updateStatistics = (_class : Class) => {
+const updateStatistics = (/*_class : Class*/) => {
 	const ages_mean_input : HTMLInputElement = (<HTMLInputElement>document.querySelector('#input-ages-mean'))
 	const heights_mean_input : HTMLInputElement = (<HTMLInputElement>document.querySelector('#input-heights-mean'))
 	const weights_mean_input : HTMLInputElement = (<HTMLInputElement>document.querySelector('#input-weights-mean'))
 	ages_mean_input.value = String(_class.getAgesMean())
 	heights_mean_input.value = String(_class.getHeightsMean())
 	weights_mean_input.value = String(_class.getWeightsMean())
+}
+
+const saveUpdates = () => {
+	const students = _class.getStudents()
+	const student_position = obj_globals.current_student_position
+	const card_position = student_position + 1
+	const input_name : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-name-edit-${card_position}`))
+	const input_age : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-age-edit-${card_position}`))
+	const input_height : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-height-edit-${card_position}`))
+	const input_weight : HTMLInputElement = (<HTMLInputElement>document.querySelector(`#input-weight-edit-${card_position}`))
+	const save_updates_button : HTMLElement = (<HTMLElement>document.querySelector(`#save-updates-button-${card_position}`))
+	const input_name_value : string = input_name.value
+	const input_age_value : number = parseInt(input_age.value)
+	const input_height_value : number = parseFloat(input_height.value)
+	const input_weight_value : number = parseFloat(input_weight.value)
+	students[student_position].setName(input_name_value)
+	students[student_position].setAge(input_age_value)
+	students[student_position].setHeight(input_height_value)
+	students[student_position].setWeight(input_weight_value)
+	const inputs : HTMLInputElement[] = []
+	inputs.push(input_name)
+	inputs.push(input_age)
+	inputs.push(input_height)
+	inputs.push(input_weight)
+	for (const input of inputs) {
+		input.readOnly = true
+		input.classList.remove('bg-light')
+		input.classList.replace('border-1', 'border-0')
+		input.classList.remove('rounded')
+		input.classList.remove('p-1')
+	}
+	save_updates_button.classList.replace('d-block', 'd-none')
+	updateStatistics()
 }
 
 const addNewStudent = (_class : Class) => {
@@ -228,7 +266,7 @@ const addNewStudent = (_class : Class) => {
 							altura: <input type="number"id="input-height-edit-${card_position}" class="info-input border-0" value="${height}" readonly><br>
 							peso: <input id="input-weight-edit-${card_position}" type="number" class="info-input border-0" value="${weight}" readonly>
 						</div></p>
-						<buttom id="save-updates-button-${card_position}" class="btn btn-primary d-none">Salvar</button>
+						<buttom id="save-updates-button-${card_position}" class="save-updates-button btn btn-primary d-none">Salvar</button>
 					</div>
 
 				</div>
@@ -239,11 +277,13 @@ const addNewStudent = (_class : Class) => {
 	students_info_container.innerHTML = students_info_container.innerHTML + card_element_string
 	const close_buttons : NodeListOf<HTMLElement> = document.querySelectorAll('.close-button-card')
 	const edit_buttons : NodeListOf<HTMLElement> = document.querySelectorAll('.edit-button-card')
+	const save_updates_buttons : NodeListOf<HTMLElement> = document.querySelectorAll('.save-updates-button')
 	for (let i = 0; i < close_buttons.length; i++) {
 		close_buttons[i].addEventListener('click', deleteStudent, false)
 		edit_buttons[i].addEventListener('click', enableEditStudent, false)
+		save_updates_buttons[i].addEventListener('click', saveUpdates, false)
 	}
-	updateStatistics(_class)
+	updateStatistics(/*_class*/)
 }
 
 const interval = setInterval(() => {
