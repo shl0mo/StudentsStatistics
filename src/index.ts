@@ -1,17 +1,3 @@
-/*type Student = {
-	id : number
-	name : string
-	age : number
-	height : number
-	weight : number
-}
-
-type Class = {
-	id : number
-	name : string
-	students : Student[]
-}*/
-
 class Student {
 	private id : number = 0
 	private name : string = ''
@@ -66,6 +52,15 @@ class Student {
 
 	public getWeight () : number {
 		return this.weight
+	}
+
+	public duplicatedStudent (another_student : Student) : boolean {
+		const sameName : boolean = another_student.getName() === this.getName()
+		const sameAge : boolean = another_student.getAge() === this.getAge()
+		const sameHeight : boolean = another_student.getHeight() === this.getHeight()
+		const sameWeight : boolean = another_student.getWeight() === this.getWeight()
+		if (sameName && sameAge && sameHeight && sameWeight) return true
+		else return false
 	}
 }
 
@@ -131,31 +126,99 @@ class Class {
 	}
 }
 
+function editStudent () {
+	const currentNode = this
+	const card = currentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+	const cards_collection = document.getElementsByClassName('row w-75 mb-1')
+	let student_position = 0
+	for (let i = 0; i < cards_collection.length; i++) {
+		if (cards_collection[i] === card) student_position = i
+	}
+	console.log(_class.getStudents()[student_position])
+}
+
+function deleteStudent () {
+	const currentNode = this
+	const card = currentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+	const cards_collection = document.getElementsByClassName('row w-75 mb-1')
+	let student_position = 0
+	for (let i = 0; i < cards_collection.length; i++) {
+		if (cards_collection[i] === card) student_position = i
+	}
+	document.querySelector('#students-info-container')?.children[student_position].remove()
+	_class.getStudents().splice(student_position, 1)
+	updateStatistics(_class)
+}
 
 const students : Student[] = []
 const _class : Class = new Class(1, 'Physical Education Class', students)
 
+const updateStatistics = (_class : Class) => {
+	const ages_mean_input : HTMLInputElement = (<HTMLInputElement>document.querySelector('#input-ages-mean'))
+	const heights_mean_input : HTMLInputElement = (<HTMLInputElement>document.querySelector('#input-heights-mean'))
+	const weights_mean_input : HTMLInputElement = (<HTMLInputElement>document.querySelector('#input-weights-mean'))
+	ages_mean_input.value = String(_class.getAgesMean())
+	heights_mean_input.value = String(_class.getHeightsMean())
+	weights_mean_input.value = String(_class.getWeightsMean())
+}
 
 const addNewStudent = (_class : Class) => {
 	const id = _class.getLastStudentIdReference()
 	_class.newStudentCreated()
-	const name : string = (<HTMLInputElement>document.querySelector('#input-name')).value
+	let name : string = (<HTMLInputElement>document.querySelector('#input-name')).value
+	const surname : string = (<HTMLInputElement>document.querySelector('#input-surname')).value
 	const age_string : string = (<HTMLInputElement>document.querySelector('#input-age')).value
 	const height_string : string = (<HTMLInputElement>document.querySelector('#input-height')).value
 	const weight_string : string = (<HTMLInputElement>document.querySelector('#input-weight')).value
-	if (name === '' || age_string == '' || height_string == '' || weight_string == '') {
+	if (name === '' || surname === '' ||  age_string == '' || height_string == '' || weight_string == '') {
 		alert('Preencha todos os campos')
 		return
 	}
 	const age : number = parseInt((<HTMLInputElement>document.querySelector('#input-age')).value)
 	const height : number = parseFloat((<HTMLInputElement>document.querySelector('#input-height')).value)
 	const weight : number = parseFloat((<HTMLInputElement>document.querySelector('#input-weight')).value)
+	name = `${name} ${surname}`
 	const new_student = new Student(id, name, age, height, weight)
 	const students = _class.getStudents()
+	for (const student of students) {
+		if (new_student.duplicatedStudent(student)) {
+			alert('Não é possível adicionar estudantes duplicados (com os mesmos nome, idade, altura e peso)')
+			return
+		}
+	}
 	students.push(new_student)
-	/*Next:
-	 * Create new student element and append it to the students container
-	 */
+	const students_info_container : HTMLElement = (<HTMLElement>document.querySelector('#students-info-container'))
+	let card_element_string : string = `
+		<div class="row w-75 mb-1">
+			<div class="card position-relative shadow p-1">
+				<div class="card-body">
+					<div class="d-flex flex-row justify-content-between m-0">
+						<h6 class="card-title mb-3"><input type="text" id="input-name-edit" class="info-input border-0" value="${name}" readonly></h6>
+								<div class="d-flex flex-row w-25 justify-content-around">
+								<div>
+									<button type="button" class="btn p-0 pb-2 edit-button-card" data-bs-toggle="modal" data-bs-target="modal-add-card"><i class="bi bi-pencil-square"></i></button>
+								</div>
+								<div>
+									<button type="button" class="btn-close close-button-card" aria-label="Fechar"></button>
+								</div>
+							</div>
+						</div>
+						<hr class="mt-1">
+						<p><div class="mb-1">idade: <input id="input-age-edit" class="info-input border-0" value="${age}" readonly><br> altura: <input id="input-height-edit" class="info-input border-0" value="${height}" readonly><br> peso: <input id="input-weight-edit" class="info-input border-0" value="${weight}" readonly></div></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	`
+	card_element_string = card_element_string.trim()
+	students_info_container.innerHTML = students_info_container.innerHTML + card_element_string
+	const close_buttons : NodeListOf<HTMLElement> = document.querySelectorAll('.close-button-card')
+	const edit_buttons : NodeListOf<HTMLElement> = document.querySelectorAll('.edit-button-card')
+	for (let i = 0; i < close_buttons.length; i++) {
+		close_buttons[i].addEventListener('click', deleteStudent, false)
+		edit_buttons[i].addEventListener('click', editStudent, false)
+	}
+	updateStatistics(_class)
 }
 
 const interval = setInterval(() => {
